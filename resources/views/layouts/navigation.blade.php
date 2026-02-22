@@ -57,8 +57,10 @@
                         <x-slot name="content">
                             <x-dropdown-link :href="route('dashboard')">{{ __('Кабінет') }}</x-dropdown-link>
                             
-                            {{-- НОВЕ ПОСИЛАННЯ ТУТ --}}
-                            <x-dropdown-link :href="route('profile.messages')">{{ __('Мої повідомлення') }}</x-dropdown-link>
+                            {{-- ПОКАЗУЄМО "МОЇ ПОВІДОМЛЕННЯ" ТІЛЬКИ ЯКЩО ЦЕ НЕ АДМІН --}}
+                            @if(auth()->user()->role !== 'admin')
+                                <x-dropdown-link :href="route('profile.messages')">{{ __('Мої повідомлення') }}</x-dropdown-link>
+                            @endif
                             
                             <x-dropdown-link :href="route('profile.edit')">{{ __('Профіль') }}</x-dropdown-link>
                             <form method="POST" action="{{ route('logout') }}">
@@ -99,9 +101,11 @@
             <x-responsive-nav-link href="{{ url('/about') }}">{{ __('Про нас') }}</x-responsive-nav-link>
             <x-responsive-nav-link href="{{ route('test.index') }}" class="text-purple-600 font-bold">🧠 {{ __('Тест') }}</x-responsive-nav-link>
             
-            {{-- МОБІЛЬНЕ ПОСИЛАННЯ --}}
+            {{-- МОБІЛЬНЕ ПОСИЛАННЯ ТІЛЬКИ ДЛЯ ЗВИЧАЙНИХ КОРИСТУВАЧІВ --}}
             @auth
-            <x-responsive-nav-link :href="route('profile.messages')">{{ __('Мої повідомлення') }}</x-responsive-nav-link>
+                @if(auth()->user()->role !== 'admin')
+                    <x-responsive-nav-link :href="route('profile.messages')">{{ __('Мої повідомлення') }}</x-responsive-nav-link>
+                @endif
             @endauth
         </div>
     </div>
