@@ -17,7 +17,7 @@
 
             @if(auth()->user()->role === 'admin')
                 {{-- ========================================== --}}
-                {{-- БЛОК АДМІНІСТРАТОРА (БЕЗ ЗМІН) --}}
+                {{-- БЛОК АДМІНІСТРАТОРА --}}
                 {{-- ========================================== --}}
                 <div class="space-y-8 text-left">
                     <div class="p-8 bg-white rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center">
@@ -74,6 +74,44 @@
                             </a>
                         </div>
                     </div>
+
+                    {{-- ========================================== --}}
+                    {{-- НОВИЙ БЛОК: ПОВІДОМЛЕННЯ ВІД КОРИСТУВАЧІВ --}}
+                    {{-- ========================================== --}}
+                    <div class="p-8 bg-white rounded-3xl shadow-sm border border-gray-100 mt-8">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-black text-gray-800 flex items-center gap-2 uppercase tracking-tighter italic">
+                                <i class="fa-solid fa-envelope-open-text text-purple-500"></i> Повідомлення з сайту
+                            </h3>
+                            <a href="{{ route('admin.messages.index') }}" class="text-[10px] font-black uppercase text-blue-600 tracking-widest hover:underline">
+                                Керувати всіма →
+                            </a>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            @forelse(\App\Models\Message::latest()->take(10)->get() as $message)
+                                <div class="p-5 bg-gray-50 rounded-2xl border border-gray-100 hover:bg-white hover:shadow-md transition">
+                                    <div class="flex flex-col md:flex-row justify-between md:items-center gap-2 mb-3 border-b border-gray-200 pb-3">
+                                        <div>
+                                            <span class="font-black text-gray-800 uppercase italic tracking-tighter">{{ $message->name }}</span>
+                                            <a href="mailto:{{ $message->email }}" class="text-xs font-bold text-blue-500 ml-2 hover:underline">{{ $message->email }}</a>
+                                        </div>
+                                        <span class="text-[9px] font-black uppercase text-gray-400 tracking-widest">
+                                            {{ $message->created_at->format('d.m.Y H:i') }}
+                                        </span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 italic leading-relaxed">
+                                        "{{ $message->message }}"
+                                    </p>
+                                </div>
+                            @empty
+                                <div class="py-8 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                                    <p class="text-gray-400 font-medium italic">Повідомлень поки немає.</p>
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+
                 </div>
 
             @else
@@ -85,7 +123,6 @@
                     {{-- ЛОГІКА ВИЗНАЧЕННЯ МІСТА --}}
                     @php
                         $userFavorites = Auth::user()->favorites ?? collect();
-                        // Беремо місто, яке зустрічається в обраному найчастіше
                         $detectedCity = $userFavorites->isNotEmpty() 
                             ? $userFavorites->countBy('city')->sortDesc()->keys()->first() 
                             : 'Не обрано';
@@ -105,7 +142,6 @@
                             </p>
                         </div>
                         
-                        {{-- ГАРАНТОВАНО СИНЯ КНОПКА --}}
                         <a href="{{ url('/cities') }}" 
                            style="background-color: #2563eb; color: #ffffff;"
                            class="px-8 py-3.5 rounded-2xl font-semibold hover:opacity-90 transition shadow-md flex items-center gap-3 whitespace-nowrap">
